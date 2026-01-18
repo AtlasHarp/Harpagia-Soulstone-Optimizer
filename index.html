@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Soulstone / Glyph / Grimoire Optimizer</title>
+<style>
+body { font-family: Arial, sans-serif; background:#1e293b; color:#e5e7eb; padding:20px; }
+h1,h2 { color:#fbbf24; }
+.section { background:#0f172a; padding:16px; margin-bottom:20px; border-radius:8px; }
+button { padding:10px 16px; background:#22c55e; border:none; border-radius:6px; font-weight:bold; cursor:pointer; }
+table { width:100%; border-collapse:collapse; margin-top:12px; }
+th, td { border:1px solid #334155; padding:6px; text-align:center; }
+th { background:#020617; }
+.flex { color:#60a5fa; font-weight:bold; }
+.note { color:#94a3b8; font-size:0.9em; margin-top:6px; }
+.prefer { margin-left:8px; }
+.prefer span { color:#22c55e; font-weight:bold; margin-left:4px; }
+</style>
+</head>
+<body>
+
+<h1>Soulstone / Glyph / Grimoire Optimizer</h1>
+
+<div class="section">
+<h2>Soulstone (up to 3 buffs)</h2>
+<div id="soulstone"></div>
+<button onclick="optimize()">Optimize</button>
+</div>
+
+<div class="section">
+<h2>Grimoires</h2>
+
+<label>Grimoire count:
+<select id="grimoire-count">
+<option value="1">1</option>
+<option value="2" selected>2</option>
+</select>
+</label>
+
+<h4>Grimoire Slot 1</h4>
+<select id="g1-buff"></select>
+<select id="g1-val">
+<option value="0">0</option>
+<option value="3">+3</option>
+<option value="6">+6</option>
+<option value="9">+9</option>
+<option value="12">+12</option>
+</select>
+
+<h4>Grimoire Slot 2</h4>
+<select id="g2-buff"></select>
+<select id="g2-val">
+<option value="0">0</option>
+<option value="3">+3</option>
+<option value="6">+6</option>
+<option value="9">+9</option>
+<option value="12">+12</option>
+</select>
+</div>
+
+<div class="section">
+<h2>Best Build</h2>
+<div id="results"></div>
+</div>
+
+<script>
+const BUFFS=[
+'Vengeance','Juggernaut','Ability Master','Hexed','Adrenaline','Precision',
+'Blunt Force','Bloodlust','Preemptive Strike','Tenacity','Fortitude',
+'Merciless','Heavy Armor','Emergency Rescue','Bountiful','Haste'
+];
+
+const MAX_GLYPHS=3;
+const GLYPH_NODE=3;
+const TIER=n=>n>=15?'T3':n>=10?'T2':n>=5?'T1':'T0';
+
+/* ---------- Populate Grimoire Dropdowns ---------- */
+function fillGrimoireSelect(id){
+  const s=document.getElementById(id);
+  s.innerHTML='<option value="NONE">None</option><option value="ANY">Any</option>';
+  BUFFS.forEach(b=>{
+    s.innerHTML+=`<option value="${b}">${b}</option>`;
+  });
+}
+fillGrimoireSelect('g1-buff');
+fillGrimoireSelect('g2-buff');
+
+/* ---------- Handle None → 0 ---------- */
+function handleGrimoireNone(buffId,valId){
+  const buff=document.getElementById(buffId);
+  const val=document.getElementById(valId);
+
+  function sync(){
+    if(buff.value==='NONE'){
+      val.value=0;
+      val.disabled=true;
+    }else{
+      val.disabled=false;
+      if(+val.value===0) val.value=3;
+    }
+  }
+  buff.addEventListener('change',sync);
+  sync();
+}
+
+handleGrimoireNone('g1-buff','g1-val');
+handleGrimoireNone('g2-buff','g2-val');
+
+/* ---------- Soulstone UI ---------- */
+const ssDiv=document.getElementById('soulstone');
+for(let i=0;i<3;i++){
+  const r=document.createElement('div');
+
+  const s=document.createElement('select');
+  s.id=`ss-buff-${i}`;
+  s.innerHTML='<option value="None">None</option>';
+  BUFFS.forEach(b=>s.innerHTML+=`<option>${b}</option>`);
+
+  const n=document.createElement('input');
+  n.type='number'; n.min=0; n.value=5; n.id=`ss-nodes-${i}`;
+
+  const p=document.createElement('input');
+  p.type='checkbox'; p.className='prefer'; p.id=`ss-prefer-${i}`;
+  p.onchange=limitPrefer;
+
+  const l=document.createElement('label');
+  l.appendChild(p);
+  l.innerHTML+=` Prefer <span id="chk-${i}"></span>`;
+
+  r.appendChild(s); r.appendChild(n); r.appendChild(l);
+  ssDiv.appendChild(r);
+}
+
+function limitPrefer(){
+  const checks=[...document.querySelectorAll('.prefer')].filter(c=>c.checked);
+  if(checks.length>2){ this.checked=false; return; }
+  checks.forEach(c=>{
+    document.getElementById(`chk-${c.id.split('-')[2]}`).textContent='✔';
+  });
+  [...document.querySelectorAll('.prefer')].forEach(c=>{
+    if(!c.checked){
+      document.getElementById(`chk-${c.id.split('-')[2]}`).textContent='';
+    }
+  });
+}
+
+/* ---------- Optimizer ---------- */
+function optimize(){
+  const base={}, soulstone=[], preferred=[];
+  BUFFS.forEach(b=>base[b]=0);
+
+  for(let i=0;i<3;i++){
+    const b=document.getElementById(`ss-buff-${i}`).value;
+    const n=parseInt(document.getElementById(`ss-nodes-${i}`).value)||0;
+    if(b!=='None'){
+      base[b]+=n;
+      soulstone.push(b);
+      if(document.getElementById(`ss-prefer-${i}`).checked) preferred.push(b);
+    }
+  }
+
+  const gCount=+document.getElementById('grimoire-count').value;
+  const slots=[
+    {slot:1,buff:document.getElementById('g1-buff').value,val:+document.getElementById('g1-val').value},
+    {slot:2,buff:document.getElementById('g2-buff').value,val:+document.getElementById('g2-val').value}
+  ].slice(0,gCount);
+
+  let best=null,bestScore=-1e9;
+
+  function expand(i,used,acc){
+    if(i===slots.length){ evaluate(acc); return; }
+    const s=slots[i];
+
+    if(s.buff==='NONE'){
+      expand(i+1,used,[...acc,s]);
+      return;
+    }
+
+    if(s.buff==='ANY'){
+      BUFFS.forEach(b=>{
+        if(!used.includes(b)){
+          expand(i+1,[...used,b],[...acc,{...s,buff:b,fromAny:true}]);
+        }
+      });
+    }else{
+      if(!used.includes(s.buff)){
+        expand(i+1,[...used,s.buff],[...acc,{...s,fromAny:false}]);
+      }
+    }
+  }
+
+  function evaluate(grims){
+    const nodes=JSON.parse(JSON.stringify(base));
+    let flexible=0;
+    const gText=[];
+
+    grims.forEach(g=>{
+      if(g.buff==='NONE' || g.val===0) return;
+
+      if(soulstone.includes(g.buff)){
+        nodes[g.buff]+=g.val;
+        gText.push(
+          g.fromAny
+            ? `Slot ${g.slot} (Any → ${g.buff}) +${g.val}`
+            : `${g.buff} +${g.val}`
+        );
+      }else{
+        flexible+=g.val;
+        gText.push(
+          g.fromAny
+            ? `Slot ${g.slot} (Any → Flexible) +${g.val}`
+            : `Flexible +${g.val}`
+        );
+      }
+    });
+
+    const glyphs=[];
+    for(let g=0;g<MAX_GLYPHS;g++){
+      const targets=[
+        ...preferred.filter(b=>nodes[b]<15),
+        ...soulstone.filter(b=>!preferred.includes(b)&&nodes[b]<15)
+      ];
+      if(targets.length<2) break;
+      nodes[targets[0]]+=GLYPH_NODE;
+      nodes[targets[1]]+=GLYPH_NODE;
+      glyphs.push(`${targets[0]} +3 / ${targets[1]} +3`);
+    }
+
+    let score=0;
+    soulstone.forEach(b=>{
+      if(nodes[b]>=15) score+=preferred.includes(b)?300:200;
+      else if(nodes[b]>=10) score+=50;
+    });
+
+    if(score>bestScore){
+      bestScore=score;
+      best={nodes,grimoires:gText,glyphs,flexible};
+    }
+  }
+
+  expand(0,[],[]);
+  render(best);
+}
+
+/* ---------- Render ---------- */
+function render(b){
+  const d=document.getElementById('results');
+  d.innerHTML='';
+  d.innerHTML+=`<p><b>Grimoires:</b> ${b.grimoires.join(', ')||'None'}${b.flexible?`, <span class="flex">Flexible +${b.flexible}</span>`:''}</p>`;
+  d.innerHTML+=`<p><b>Glyphs:</b> ${b.glyphs.join(' | ')||'None'}</p>`;
+
+  const t=document.createElement('table');
+  t.innerHTML='<tr><th>Buff</th><th>Nodes</th><th>Tier</th></tr>';
+  Object.entries(b.nodes).forEach(([buff,n])=>{
+    if(n>0) t.innerHTML+=`<tr><td>${buff}</td><td>${n}</td><td>${TIER(n)}</td></tr>`;
+  });
+  d.appendChild(t);
+
+  if(b.flexible){
+    const bp=[5,10,15];
+    const c=Object.entries(b.nodes)
+      .map(([buff,n])=>{
+        const t=bp.find(x=>n<x && n+b.flexible>=x);
+        return t?{buff,n,t}:null;
+      }).filter(Boolean)[0];
+
+    d.innerHTML+=`<div class="note">${
+      c
+        ? `${b.flexible} flexible nodes can be used to push <b>${c.buff}</b> from ${c.n} → ${c.t} (${TIER(c.t)}).`
+        : `${b.flexible} flexible nodes can be assigned anywhere.`
+    }</div>`;
+  }
+}
+</script>
+</body>
+</html>
