@@ -1,344 +1,452 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Harpagia Soulstone Optimizer - Legal Grimoires</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=MedievalSharp&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harpagia Soulstone Optimizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 <style>
-body{
-  font-family: 'Cinzel', serif;
-  background: linear-gradient(135deg, #2b0a3d, #4b1e65, #1b0f2f);
-  color:#f0e6f5;
-  padding:20px;
-}
-h1{
-  font-family: 'MedievalSharp', cursive;
-  font-size: 36px;
-  color: #ffdb6b;
-  text-shadow: 0 0 8px #ffdb6b, 0 0 12px #a64ca6;
-}
-select,button,input{
-  padding:6px;
-  font-size:15px;
-  margin:4px;
-  border-radius:4px;
-  border: 1px solid #7c4c99;
-  background:#2f1b3f;
-  color:#f0e6f5;
-}
-button{
-  padding:10px 18px;
-  background:#7c4c99;
-  border:none;
-  color:#fff;
-  cursor:pointer;
-  font-weight:bold;
-  text-shadow: 0 0 3px #000;
-}
-button:hover{
-  background:#9c6fc4;
-}
-.build{
-  background:#3b1f52;
-  padding:12px;
-  margin-top:15px;
-  border-radius:6px;
-  box-shadow: 0 0 10px rgba(255,219,107,0.3);
-}
-.section{
-  margin-top:10px;
-  font-weight:bold;
-  text-shadow: 0 0 2px #000;
-}
-.affix{
-  margin-left:12px;
-}
-.total{color:#7CFF9B;}
-.error{color:#FF6B6B;}
-.infoBox{
-  background:#2a1338; 
-  padding:10px; 
-  border-radius:6px; 
-  margin-bottom:15px;
-  box-shadow: 0 0 6px rgba(255,219,107,0.2);
-}
-.infoBox div{
-  color:#fff; 
-  outline:none;
-}
+  :root {
+    --bg:           #0b0b0f;
+    --surface:      #111118;
+    --raised:       #181820;
+    --border:       #2a2535;
+    --border-hi:    #3d3450;
+    --gold:         #c9a96e;
+    --gold-dim:     #8a6f3e;
+    --gold-glow:    rgba(201,169,110,0.15);
+    --crimson:      #9b2335;
+    --crimson-dim:  #6b1720;
+    --parchment:    #e2d5bc;
+    --parchment-dim:#a89070;
+    --jade:         #5aad7a;
+    --jade-dim:     #2d6644;
+    --amber:        #d4874a;
+    --text:         #cfc2a8;
+    --text-dim:     #7a6e5c;
+    --radius:       8px;
+    --radius-lg:    12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IM Fell English', Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 20px 60px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: -120px; left: 50%;
+    transform: translateX(-50%);
+    width: 700px; height: 400px;
+    background: radial-gradient(ellipse, rgba(155,35,53,0.10) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .page-wrap {
+    position: relative; z-index: 1;
+    max-width: 820px; margin: 0 auto;
+  }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 36px; animation: fadeDown 0.6s ease both; }
+  .header-eyebrow {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    letter-spacing: 0.3em; color: var(--crimson);
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(22px, 5vw, 36px); font-weight: 700;
+    color: var(--gold); line-height: 1.2; letter-spacing: 0.02em;
+    text-shadow: 0 0 40px rgba(201,169,110,0.25), 0 2px 4px rgba(0,0,0,0.8);
+  }
+  .header-rule {
+    display: flex; align-items: center; gap: 12px;
+    margin-top: 14px; color: var(--gold-dim); font-size: 18px;
+  }
+  .header-rule::before, .header-rule::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 20px 24px;
+    margin-bottom: 16px; animation: fadeUp 0.5s ease both;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right, transparent, var(--border-hi), transparent);
+  }
+  .card-title {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--gold-dim); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* Info Box */
+  .infoBox {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--crimson-dim); border-radius: var(--radius-lg);
+    padding: 18px 22px; margin-bottom: 16px; animation: fadeUp 0.4s ease both;
+  }
+  .info-header {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 10px;
+  }
+  .infoBox [contenteditable] { font-size: 14px; line-height: 1.75; color: var(--text-dim); outline: none; }
+  .infoBox [contenteditable] div { margin-top: 3px; }
+  .infoBox strong { color: var(--parchment); font-style: normal; }
+
+  /* Form */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 580px) { .form-grid { grid-template-columns: 1fr; } }
+
+  .field-label {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 8px; display: block;
+  }
+  .selects-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .grimoire-pair { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .grimoire-pair-label {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--text-dim); min-width: 44px;
+  }
+
+  /* Inputs */
+  select, input[type="number"] {
+    font-family: 'IM Fell English', Georgia, serif; font-size: 14px;
+    padding: 8px 10px; background: var(--raised); color: var(--parchment);
+    border: 1px solid var(--border-hi); border-radius: var(--radius);
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s; appearance: auto;
+  }
+  select:focus, input[type="number"]:focus {
+    border-color: var(--gold-dim); box-shadow: 0 0 0 2px var(--gold-glow);
+  }
+  input[type="number"] { width: 72px; text-align: center; }
+
+  /* Button */
+  .btn-optimize {
+    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 13px 32px;
+    background: linear-gradient(135deg, #7a1e2e, #9b2335);
+    color: #f5d9b5; border: 1px solid #b83040; border-radius: var(--radius);
+    cursor: pointer; transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    box-shadow: 0 4px 20px rgba(155,35,53,0.25), inset 0 1px 0 rgba(255,255,255,0.07);
+    width: 100%; margin-top: 8px;
+  }
+  .btn-optimize:hover {
+    background: linear-gradient(135deg, #9b2335, #b83040);
+    box-shadow: 0 6px 28px rgba(155,35,53,0.4); transform: translateY(-1px);
+  }
+  .btn-optimize:active { transform: translateY(0); box-shadow: 0 2px 10px rgba(155,35,53,0.3); }
+
+  /* Snap Note */
+  .snapNote { font-size: 13px; font-style: italic; color: var(--amber); margin-top: 8px; min-height: 18px; }
+
+  /* Results */
+  .results-header {
+    font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--text-dim);
+    text-align: center; margin: 28px 0 16px;
+  }
+
+  .build {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 0; margin-bottom: 14px;
+    overflow: hidden; animation: fadeUp 0.4s ease both; position: relative;
+  }
+  .build-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; background: var(--raised); border-bottom: 1px solid var(--border);
+  }
+  .build-title { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; color: var(--gold); }
+  .badge {
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.15em;
+    text-transform: uppercase; padding: 3px 10px; border-radius: 20px;
+  }
+  .badge-full   { background: rgba(90,173,122,0.15); color: var(--jade);   border: 1px solid var(--jade-dim); }
+  .badge-fallback { background: rgba(155,35,53,0.12); color: #c06070; border: 1px solid var(--crimson-dim); }
+
+  .build-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; }
+
+  .build-section-label {
+    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--gold-dim); margin-bottom: 6px;
+    padding-bottom: 5px; border-bottom: 1px solid var(--border);
+  }
+
+  .build-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 3px 0; font-size: 14px;
+  }
+  .build-row-name { color: var(--text); }
+  .build-row-val { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; color: var(--gold); }
+
+  .glyph-list { display: flex; flex-direction: column; gap: 4px; }
+  .glyph-row { font-size: 14px; color: var(--text); padding: 2px 0; }
+  .glyph-plus { color: var(--gold-dim); }
+
+  .totals-row {
+    display: flex; align-items: center;
+    padding: 4px 0; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .totals-row:last-child { border-bottom: none; }
+  .totals-bar {
+    flex: 1; height: 4px; background: var(--border); border-radius: 2px;
+    margin: 0 12px; overflow: hidden;
+  }
+  .totals-bar-fill { height: 100%; border-radius: 2px; }
+  .totals-name { font-size: 14px; color: var(--text); min-width: 160px; }
+  .totals-val { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; min-width: 28px; text-align: right; }
+  .totals-val.maxed { color: var(--jade); }
+  .totals-val.low   { color: var(--parchment-dim); }
+  .totals-val.mid   { color: var(--gold); }
+
+  .error { text-align: center; color: #c06070; font-style: italic; padding: 20px; }
+
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(12px)}  to{opacity:1;transform:translateY(0)} }
+  .card:nth-child(1){animation-delay:0.05s}
+  .card:nth-child(2){animation-delay:0.10s}
+  .card:nth-child(3){animation-delay:0.15s}
 </style>
 </head>
 <body>
+<div class="page-wrap">
 
-<h1>Harpagia Soulstone Optimizer</h1>
-
-<div class="infoBox">
- <strong>User Instructions:</strong> If you have any issues ping <strong>𝔸𝕥𝕝𝕒𝕤ッ</strong> on Discord.
-  <div contenteditable="true">
- V2 supports <strong>ALL</strong> builds from 3/3/3 up to 3/3/3/3.
-    <div>Select Affix's and values <strong>in order.</strong></div>
-    <div>Select Affix 4 as desired overflow.</div>
-    <div>Selecting "Any" for Grimoires assumes you have <strong>ALL</strong> of them.</div>
-<div>When using 9/6/3+ stones to make 3/3/3/3 builds it is <strong>extremely important</strong> that you round down to the <strong>3/6/9</strong> values for the lower stat (the logic likes these for some weird reason).</div> 
-<div>Example - 9/6/4 <- Soulstone -> Input 9/6/3 on optimizer (the 1 point changes nothing in the game but for the optimizer it fixes everything)
-<strong>9/6/4,5,7,8 -> 9/6/3,6,9.</strong></div>
-<div>IF your result seems off - switch grimoire <strong>value</strong> selections around from <strong>slot 1 to slot 2.</strong></div>
-<div>When making 3/3/3+ builds Grimoire slot 1 prefers "main" affixes on the Soulstone while Grimoire slot 2 will prefer the 4th "overflow" affix.</div>   
+  <div class="header">
+    <div class="header-eyebrow">Harpagia · Build Tool</div>
+    <h1>Soulstone Optimizer</h1>
+    <div class="header-rule">✦</div>
   </div>
+
+  <div class="infoBox">
+    <div class="info-header">Instructions — ping <strong>𝔸𝕥𝕝𝕒𝕤ッ</strong> on Discord for issues</div>
+    <div contenteditable="true">
+      V2 supports <strong>ALL</strong> builds from 3/3/3 up to 3/3/3/3.
+      <div>Select affixes and values <strong>in order.</strong> Select Affix 4 as your desired overflow.</div>
+      <div>Selecting <strong>"Any"</strong> for Grimoires assumes you have all of them.</div>
+      <div>Soulstone values are auto-snapped to the nearest <strong>3, 6, or 9</strong> — a warning will appear if adjusted.</div>
+      <div>If your result seems off — swap grimoire <strong>value</strong> selections between slot 1 and slot 2.</div>
+      <div>Grimoire slot 1 prefers main affixes; slot 2 prefers the 4th overflow affix.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Select 4 Affixes</div>
+    <span class="field-label">Affixes 1–3 are primary · Affix 4 is overflow</span>
+    <div class="selects-row">
+      <select id="a1"></select>
+      <select id="a2"></select>
+      <select id="a3"></select>
+      <select id="a4"></select>
+    </div>
+  </div>
+
+  <div class="form-grid">
+    <div class="card">
+      <div class="card-title">Soulstone Values</div>
+      <span class="field-label">Values 0–9 for first three affixes</span>
+      <div class="selects-row">
+        <input id="v1" type="number" min="0" max="9" value="3">
+        <input id="v2" type="number" min="0" max="9" value="6">
+        <input id="v3" type="number" min="0" max="9" value="9">
+      </div>
+      <div id="snapNote" class="snapNote"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Grimoires</div>
+      <span class="field-label">Player-owned or "Any"</span>
+      <div class="grimoire-pair">
+        <span class="grimoire-pair-label">Slot 1</span>
+        <select id="g1Affix"><option value="Any">Any</option></select>
+        <select id="g1Value">
+          <option value="3">3</option><option value="6">6</option>
+          <option value="9">9</option><option value="12">12</option>
+        </select>
+      </div>
+      <div class="grimoire-pair">
+        <span class="grimoire-pair-label">Slot 2</span>
+        <select id="g2Affix"><option value="Any">Any</option></select>
+        <select id="g2Value">
+          <option value="3">3</option><option value="6">6</option>
+          <option value="9">9</option><option value="12">12</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-optimize" onclick="run()">⚔ Optimize My Build</button>
+
+  <div id="output"></div>
+
 </div>
-
-<div>
-Select 4 Affixes (#4 is overflow):
-<br>
-<select id="a1"></select>
-<select id="a2"></select>
-<select id="a3"></select>
-<select id="a4"></select>
-</div>
-
-<div style="margin-top:10px">
-Soulstone Starting Values (1–10) for first three affixes:
-<br>
-<input id="v1" type="number" min="0" max="10" value="3">
-<input id="v2" type="number" min="0" max="10" value="6">
-<input id="v3" type="number" min="0" max="10" value="9">
-</div>
-
-<div class="section">
-Select Grimoires (Player-Owned or “Any”)
-<br>
-<select id="g1Affix"><option value="Any">Any</option></select>
-<select id="g1Value">
-  <option value="3">3</option>
-  <option value="6">6</option>
-  <option value="9">9</option>
-  <option value="12">12</option>
-</select>
-<select id="g2Affix"><option value="Any">Any</option></select>
-<select id="g2Value">
-  <option value="3">3</option>
-  <option value="6">6</option>
-  <option value="9">9</option>
-  <option value="12">12</option>
-</select>
-</div>
-
-<button onclick="run()">Optimize My Build</button>
-
-<div id="output"></div>
 
 <script>
-const AFFIXES = [
- "Vengeance","Juggernaut","Ability Master","Hexed",
- "Adrenaline","Precision","Blunt Force","Bloodlust",
- "Preemptive Strike","Tenacity","Fortitude","Merciless",
- "Heavy Armor","Emergency Rescue","Bountiful","Haste"
-];
-
-const GLYPH_VALUE = 3;
-const TARGET = 15;
-const GRIMOIRE_VALUES = [3,6,9,12];
+const AFFIXES=["Vengeance","Juggernaut","Ability Master","Hexed","Adrenaline","Precision","Blunt Force","Bloodlust","Preemptive Strike","Tenacity","Fortitude","Merciless","Heavy Armor","Emergency Rescue","Bountiful","Haste"];
+const GLYPH_VALUE=3,TARGET=15,GRIMOIRE_VALUES=[3,6,9,12];
 
 function populate(){
   [a1,a2,a3,a4,g1Affix,g2Affix].forEach(sel=>{
-    AFFIXES.forEach(a=>{
-      const o=document.createElement("option");
-      o.value=a; o.textContent=a;
-      sel.appendChild(o);
-    });
+    AFFIXES.forEach(a=>{ const o=document.createElement("option"); o.value=a; o.textContent=a; sel.appendChild(o); });
   });
 }
 populate();
 
+function snapToMultipleOf3(v){ return Math.floor(v/3)*3; }
+
 function combinations(arr,k){
   const result=[];
   function comb(temp,start){
-    if(temp.length===k){
-      result.push(temp.slice());
-      return;
-    }
-    for(let i=start;i<arr.length;i++){
-      temp.push(arr[i]);
-      comb(temp,i+1);
-      temp.pop();
-    }
+    if(temp.length===k){ result.push(temp.slice()); return; }
+    for(let i=start;i<arr.length;i++){ temp.push(arr[i]); comb(temp,i+1); temp.pop(); }
   }
-  comb([],0);
-  return result;
+  comb([],0); return result;
 }
 
 function generateGlyphSets(affixes){
-  const allPairs = combinations(affixes,2);
-  const sets=[];
-  for(let i=0;i<allPairs.length;i++){
-    for(let j=0;j<allPairs.length;j++){
+  const allPairs=combinations(affixes,2), sets=[];
+  for(let i=0;i<allPairs.length;i++)
+    for(let j=0;j<allPairs.length;j++)
       for(let k=0;k<allPairs.length;k++){
-        const glyphs=[allPairs[i],allPairs[j],allPairs[k]];
-        if(glyphs.some(g=>g[0]===g[1])) continue;
-        sets.push(glyphs);
+        const g=[allPairs[i],allPairs[j],allPairs[k]];
+        if(g.some(x=>x[0]===x[1])) continue; sets.push(g);
       }
-    }
-  }
   return sets;
 }
 
-function assignGrimoire(affix, nodes, totals){
+function assignGrimoire(affix,nodes,totals){
   if(totals[affix]>=TARGET) return 0;
-  const assign = GRIMOIRE_VALUES.filter(v=>v<=Math.min(nodes, TARGET - totals[affix])).pop() || 0;
-  totals[affix] += assign;
-  return assign;
+  const assign=GRIMOIRE_VALUES.filter(v=>v<=Math.min(nodes,TARGET-totals[affix])).pop()||0;
+  totals[affix]+=assign; return assign;
 }
 
-// --------------------
-// Calculate totals with redistribution to underfilled affixes
 function calcTotals(soulstone,glyphs,grimoires){
   const totals={};
   soulstone.forEach(s=>totals[s.name]=(totals[s.name]||0)+s.nodes);
-
-  glyphs.forEach(g=>{
-    totals[g[0]]=(totals[g[0]]||0)+GLYPH_VALUE;
-    totals[g[1]]=(totals[g[1]]||0)+GLYPH_VALUE;
-  });
-
-  // Track which affixes have already been assigned a grimoire
-  const usedGrimoires = {};
-
+  glyphs.forEach(g=>{ totals[g[0]]=(totals[g[0]]||0)+GLYPH_VALUE; totals[g[1]]=(totals[g[1]]||0)+GLYPH_VALUE; });
+  const used={};
   grimoires.forEach(g=>{
     if(g.affix==="Any"){
-      const underfilled = Object.keys(totals).filter(a=>totals[a]<TARGET && !usedGrimoires[a]);
-      if(underfilled.length>0){
-        const aff = underfilled[0];
-        const assign = assignGrimoire(aff, g.nodes, totals);
-        if(assign > 0) usedGrimoires[aff] = true;
-      }
+      const under=Object.keys(totals).filter(a=>totals[a]<TARGET&&!used[a]);
+      if(under.length>0){ const aff=under[0]; const r=assignGrimoire(aff,g.nodes,totals); if(r>0) used[aff]=true; }
     } else {
-      if(!usedGrimoires[g.affix]){
-        const assign = assignGrimoire(g.affix, g.nodes, totals);
-        if(assign > 0) usedGrimoires[g.affix] = true;
-      }
+      if(!used[g.affix]){ const r=assignGrimoire(g.affix,g.nodes,totals); if(r>0) used[g.affix]=true; }
     }
   });
-
-  // Redistribute excess from first 3 affixes to 4th affix
-  const fourthAffix = Object.keys(totals)[3];
-  let excess = 0;
-  Object.keys(totals).slice(0,3).forEach(a=>{
-    if(totals[a]>TARGET){
-      excess += totals[a]-TARGET;
-      totals[a] = TARGET;
-    }
-  });
-  if(totals[fourthAffix]<TARGET){
-    const assign = Math.min(excess, TARGET - totals[fourthAffix]);
-    totals[fourthAffix] += assign;
-  }
-
+  const fourth=Object.keys(totals)[3]; let excess=0;
+  Object.keys(totals).slice(0,3).forEach(a=>{ if(totals[a]>TARGET){ excess+=totals[a]-TARGET; totals[a]=TARGET; } });
+  if(fourth&&totals[fourth]<TARGET) totals[fourth]+=Math.min(excess,TARGET-totals[fourth]);
   return totals;
 }
 
-// --------------------
 function solveBuilds(A,soulVals,playerGrimoires){
-  const soulstone=[
-    {name:A[0],nodes:soulVals[0]},
-    {name:A[1],nodes:soulVals[1]},
-    {name:A[2],nodes:soulVals[2]},
-    {name:A[3],nodes:0}
-  ];
-
-  const glyphSets=generateGlyphSets(A);
-  const builds=[];
-
+  const soulstone=[{name:A[0],nodes:soulVals[0]},{name:A[1],nodes:soulVals[1]},{name:A[2],nodes:soulVals[2]},{name:A[3],nodes:0}];
+  const glyphSets=generateGlyphSets(A), builds=[];
   for(const glyphs of glyphSets){
     const totals=calcTotals(soulstone,glyphs,playerGrimoires);
-    const fullT3 = Object.values(totals).every(v=>v>=TARGET);
-    builds.push({soulstone,glyphs,grimoires:playerGrimoires,totals,full:fullT3});
+    builds.push({soulstone,glyphs,grimoires:playerGrimoires,totals,full:Object.values(totals).every(v=>v>=TARGET)});
   }
-
   builds.sort((a,b)=>{
-    if(a.full && !b.full) return -1;
-    if(!a.full && b.full) return 1;
-    const aVals=[a.totals[A[0]],a.totals[A[1]],a.totals[A[2]],a.totals[A[3]]];
-    const bVals=[b.totals[A[0]],b.totals[A[1]],b.totals[A[2]],b.totals[A[3]]];
-    for(let i=0;i<3;i++){
-      if(aVals[i]!==bVals[i]) return bVals[i]-aVals[i];
-    }
-    return bVals[3]-aVals[3];
+    if(a.full&&!b.full) return -1; if(!a.full&&b.full) return 1;
+    const aV=[a.totals[A[0]],a.totals[A[1]],a.totals[A[2]],a.totals[A[3]]];
+    const bV=[b.totals[A[0]],b.totals[A[1]],b.totals[A[2]],b.totals[A[3]]];
+    for(let i=0;i<3;i++) if(aV[i]!==bV[i]) return bV[i]-aV[i];
+    return bV[3]-aV[3];
   });
-
   return builds.slice(0,5);
 }
 
 function run(){
   const A=[a1.value,a2.value,a3.value,a4.value];
-  if(new Set(A).size!==4){
-    alert("Choose four different affixes.");
-    return;
-  }
+  if(new Set(A).size!==4){ alert("Choose four different affixes."); return; }
+  const rawVals=[Number(v1.value),Number(v2.value),Number(v3.value)];
+  if(rawVals.some(v=>v<0||v>9)){ alert("Soulstone values must be between 0 and 9."); return; }
+  const vals=rawVals.map(snapToMultipleOf3);
+  const snapNoteEl=document.getElementById("snapNote");
+  const snapped=rawVals.map((r,i)=>r!==vals[i]?`V${i+1}: ${r}→${vals[i]}`:null).filter(Boolean);
+  snapNoteEl.textContent=snapped.length?`⚠ Auto-adjusted: ${snapped.join(", ")}` :"";
 
-  const vals=[Number(v1.value),Number(v2.value),Number(v3.value)];
-  if(vals.some(v=>v<0||v>10)){
-    alert("Soulstone values must be between 0 and 10.");
-    return;
-  }
-
-  const playerGrimoires=[
-    {affix:g1Affix.value,nodes:Number(g1Value.value)},
-    {affix:g2Affix.value,nodes:Number(g2Value.value)}
-  ];
-
+  const playerGrimoires=[{affix:g1Affix.value,nodes:Number(g1Value.value)},{affix:g2Affix.value,nodes:Number(g2Value.value)}];
   const builds=solveBuilds(A,vals,playerGrimoires);
   const out=document.getElementById("output");
   out.innerHTML="";
-
-  if(builds.length===0){
-    out.innerHTML="<div class='error'>No valid build or fallback found.</div>";
-    return;
-  }
+  if(!builds.length){ out.innerHTML="<div class='error'>No valid build found.</div>"; return; }
+  out.innerHTML=`<div class="results-header">— ${builds.length} Build${builds.length>1?"s":""} Found —</div>`;
 
   builds.forEach((build,index)=>{
-    const div=document.createElement("div");
-    div.className="build";
-
-    const simplifiedGrimoires=[];
-    const totalsWithoutGrim={};
-    build.soulstone.forEach(s=>totalsWithoutGrim[s.name]=s.nodes);
-    build.glyphs.forEach(g=>{
-      totalsWithoutGrim[g[0]]=(totalsWithoutGrim[g[0]]||0)+GLYPH_VALUE;
-      totalsWithoutGrim[g[1]]=(totalsWithoutGrim[g[1]]||0)+GLYPH_VALUE;
-    });
-
-    const usedGrimoires = {};
+    const simplifiedGrimoires=[], tw={};
+    build.soulstone.forEach(s=>tw[s.name]=s.nodes);
+    build.glyphs.forEach(g=>{ tw[g[0]]=(tw[g[0]]||0)+GLYPH_VALUE; tw[g[1]]=(tw[g[1]]||0)+GLYPH_VALUE; });
+    const usedG={};
     for(const g of build.grimoires){
-      let aff;
-      if(g.affix==="Any"){
-        aff = Object.keys(totalsWithoutGrim).find(a=>totalsWithoutGrim[a]<TARGET && !usedGrimoires[a]);
-      } else {
-        aff = g.affix;
-      }
-      if(aff && !usedGrimoires[aff]){
-        const assign = assignGrimoire(aff, g.nodes, totalsWithoutGrim);
-        if(assign>0){
-          simplifiedGrimoires.push({affix:aff,nodes:assign});
-          usedGrimoires[aff] = true;
-        }
-      }
+      let aff=g.affix==="Any"?Object.keys(tw).find(a=>tw[a]<TARGET&&!usedG[a]):g.affix;
+      if(aff&&!usedG[aff]){ const r=assignGrimoire(aff,g.nodes,tw); if(r>0){ simplifiedGrimoires.push({affix:aff,nodes:r}); usedG[aff]=true; } }
     }
 
+    const grimHTML=simplifiedGrimoires.length
+      ? simplifiedGrimoires.map(r=>`<div class="build-row"><span class="build-row-name">${r.affix}</span><span class="build-row-val">+${r.nodes}</span></div>`).join("")
+      : `<div style="color:var(--text-dim);font-style:italic;font-size:13px">None required</div>`;
+
+    const div=document.createElement("div");
+    div.className="build"; div.style.animationDelay=`${index*0.07}s`;
     div.innerHTML=`
-      <div class="section">Build ${index+1} ${build.full?"(Full T3)":"(Fallback)"}</div>
+      <div class="build-header">
+        <div class="build-title">Build ${index+1}</div>
+        <span class="badge ${build.full?"badge-full":"badge-fallback"}">${build.full?"Full T3":"Fallback"}</span>
+      </div>
+      <div class="build-body">
 
-      <div class="section">Soulstone</div>
-      ${build.soulstone.map(s=>`<div class="affix">${s.name}: ${s.nodes}</div>`).join("")}
+        <div>
+          <div class="build-section-label">Soulstone</div>
+          ${build.soulstone.map(s=>`<div class="build-row"><span class="build-row-name">${s.name}</span><span class="build-row-val">${s.nodes}</span></div>`).join("")}
+        </div>
 
-      <div class="section">Glyphs (+3 each)</div>
-      ${build.glyphs.map(g=>`<div class="affix">${g[0]} (+3) + ${g[1]} (+3)</div>`).join("")}
+        <div>
+          <div class="build-section-label">Glyphs (+3 each)</div>
+          <div class="glyph-list">
+            ${build.glyphs.map(g=>`<div class="glyph-row">${g[0]} <span class="glyph-plus">(+3)</span> &nbsp;+&nbsp; ${g[1]} <span class="glyph-plus">(+3)</span></div>`).join("")}
+          </div>
+        </div>
 
-      <div class="section">Grimoires</div>
-      ${simplifiedGrimoires.map(r=>`<div class="affix">${r.affix}: ${r.nodes}</div>`).join("")}
+        <div>
+          <div class="build-section-label">Grimoires</div>
+          ${grimHTML}
+        </div>
 
-      <div class="section">Totals</div>
-      ${Object.entries(build.totals).map(([k,v])=>`<div class="affix total">${k}: ${v}</div>`).join("")}
-    `;
+        <div>
+          <div class="build-section-label">Totals</div>
+          ${Object.entries(build.totals).map(([k,v])=>{
+            const pct=Math.min(100,(v/TARGET)*100);
+            const barColor=v>=TARGET?"var(--jade)":v>=12?"var(--gold-dim)":"var(--crimson-dim)";
+            const cls=v>=TARGET?"maxed":v<9?"low":"mid";
+            return `<div class="totals-row">
+              <span class="totals-name">${k}</span>
+              <div class="totals-bar"><div class="totals-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+              <span class="totals-val ${cls}">${v}</span>
+            </div>`;
+          }).join("")}
+        </div>
+
+      </div>`;
     out.appendChild(div);
   });
 }
