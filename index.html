@@ -370,11 +370,15 @@ function combinations(arr,k){
 
 function generateGlyphSets(affixes){
   const allPairs=combinations(affixes,2).filter(([a,b])=>AFFIX_CATEGORY[a]!==AFFIX_CATEGORY[b]);
-  const sets=[];
+  const seen=new Set(), sets=[];
   for(let i=0;i<allPairs.length;i++)
     for(let j=0;j<allPairs.length;j++)
       for(let k=0;k<allPairs.length;k++){
-        sets.push([allPairs[i],allPairs[j],allPairs[k]]);
+        const g=[allPairs[i],allPairs[j],allPairs[k]];
+        const key=g.map(p=>[...p].sort().join('|')).sort().join('||');
+        if(seen.has(key)) continue;
+        seen.add(key);
+        sets.push(g);
       }
   return sets;
 }
@@ -398,9 +402,8 @@ function calcTotals(soulstone,glyphs,grimoires){
       if(!used[g.affix]){ const r=assignGrimoire(g.affix,g.nodes,totals); if(r>0) used[g.affix]=true; }
     }
   });
-  const fourth=Object.keys(totals)[3]; let excess=0;
-  Object.keys(totals).slice(0,3).forEach(a=>{ if(totals[a]>TARGET){ excess+=totals[a]-TARGET; totals[a]=TARGET; } });
-  if(fourth&&totals[fourth]<TARGET) totals[fourth]+=Math.min(excess,TARGET-totals[fourth]);
+  // Cap each affix at TARGET — no overflow transfer between affixes
+  Object.keys(totals).forEach(a=>{ if(totals[a]>TARGET) totals[a]=TARGET; });
   return totals;
 }
 
@@ -423,9 +426,9 @@ function solveBuilds(A,soulVals,playerGrimoires){
 
 function run(){
   const A=[a1.value,a2.value,a3.value,a4.value];
-  if(new Set(A).size!==4){ alert("Choose four different affixes."); return; }
+  if(new Set(A).size!==4){ out.innerHTML="<div class='error' style='color:var(--crimson);font-family:Cinzel,serif;padding:16px;text-align:center;letter-spacing:.1em'>⚠ Choose four different affixes.</div>"; return; }
   const rawVals=[Number(v1.value),Number(v2.value),Number(v3.value)];
-  if(rawVals.some(v=>v<0||v>9)){ alert("Soulstone values must be between 0 and 9."); return; }
+  if(rawVals.some(v=>v<0||v>9)){ out.innerHTML="<div class='error' style='color:var(--crimson);font-family:Cinzel,serif;padding:16px;text-align:center;letter-spacing:.1em'>⚠ Soulstone values must be between 0 and 9.</div>"; return; }
   const vals=rawVals.map(snapToMultipleOf3);
   const snapNoteEl=document.getElementById("snapNote");
   const snapped=rawVals.map((r,i)=>r!==vals[i]?`V${i+1}: ${r}→${vals[i]}`:null).filter(Boolean);
