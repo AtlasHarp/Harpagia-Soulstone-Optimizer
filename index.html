@@ -304,6 +304,13 @@
 const AFFIXES=["Vengeance","Juggernaut","Ability Master","Hexed","Adrenaline","Precision","Blunt Force","Bloodlust","Preemptive Strike","Tenacity","Fortitude","Merciless","Heavy Armor","Emergency Rescue","Bountiful","Haste"];
 const GLYPH_VALUE=3,TARGET=15,GRIMOIRE_VALUES=[3,6,9,12];
 
+const AFFIX_CATEGORY={
+  "Vengeance":"Might","Juggernaut":"Might","Ability Master":"Might","Hexed":"Might",
+  "Adrenaline":"Lethality","Precision":"Lethality","Blunt Force":"Lethality","Bloodlust":"Lethality",
+  "Preemptive Strike":"Adaptation","Tenacity":"Adaptation","Fortitude":"Adaptation","Merciless":"Adaptation",
+  "Heavy Armor":"Resilience","Emergency Rescue":"Resilience","Bountiful":"Resilience","Haste":"Resilience"
+};
+
 function populate(){
   [a1,a2,a3,a4,g1Affix,g2Affix].forEach(sel=>{
     AFFIXES.forEach(a=>{ const o=document.createElement("option"); o.value=a; o.textContent=a; sel.appendChild(o); });
@@ -323,12 +330,14 @@ function combinations(arr,k){
 }
 
 function generateGlyphSets(affixes){
-  const allPairs=combinations(affixes,2), sets=[];
+  // Only keep pairs where the two affixes are from different categories
+  const allPairs=combinations(affixes,2).filter(([a,b])=>AFFIX_CATEGORY[a]!==AFFIX_CATEGORY[b]);
+  const sets=[];
   for(let i=0;i<allPairs.length;i++)
     for(let j=0;j<allPairs.length;j++)
       for(let k=0;k<allPairs.length;k++){
         const g=[allPairs[i],allPairs[j],allPairs[k]];
-        if(g.some(x=>x[0]===x[1])) continue; sets.push(g);
+        sets.push(g);
       }
   return sets;
 }
