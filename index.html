@@ -330,6 +330,7 @@
   .affix-slot .field-label { margin: 0; text-align: center; }
   .affix-slot select { width: 100%; }
   .affix-slot .sel-wrap { width: 100%; justify-content: center; }
+  .affix-slot .picker-cat { text-align: center; }
   .affix-slot .sel-preview { width: 28px; height: 28px; }
   .affix-slot input[type=number] { width: 80px; text-align: center; }
   .overflow-tag {
@@ -499,11 +500,11 @@
           <button class="picker-trigger" id="btn-a1" onclick="togglePicker(event,'a1')">
             <img id="a1_prev" class="picker-icon">
             <span class="picker-label none" id="a1-label">(None)</span>
-            <span class="picker-cat" id="a1-cat"></span>
             <span class="picker-arrow">▾</span>
           </button>
           <div class="picker-drop" id="picker-a1-drop"></div>
         </div>
+        <span class="picker-cat" id="a1-cat"></span>
         <input type="hidden" id="a1" value="">
         <div class="numpad-wrap">
           <button class="numpad-trigger" onclick="openNumpad(event,'aff1')">Affix Points</button>
@@ -522,11 +523,11 @@
           <button class="picker-trigger" id="btn-a2" onclick="togglePicker(event,'a2')">
             <img id="a2_prev" class="picker-icon">
             <span class="picker-label none" id="a2-label">(None)</span>
-            <span class="picker-cat" id="a2-cat"></span>
             <span class="picker-arrow">▾</span>
           </button>
           <div class="picker-drop" id="picker-a2-drop"></div>
         </div>
+        <span class="picker-cat" id="a2-cat"></span>
         <input type="hidden" id="a2" value="">
         <div class="numpad-wrap">
           <button class="numpad-trigger" onclick="openNumpad(event,'aff2')">Affix Points</button>
@@ -541,11 +542,11 @@
           <button class="picker-trigger" id="btn-a3" onclick="togglePicker(event,'a3')">
             <img id="a3_prev" class="picker-icon">
             <span class="picker-label none" id="a3-label">(None)</span>
-            <span class="picker-cat" id="a3-cat"></span>
             <span class="picker-arrow">▾</span>
           </button>
           <div class="picker-drop" id="picker-a3-drop"></div>
         </div>
+        <span class="picker-cat" id="a3-cat"></span>
         <input type="hidden" id="a3" value="">
         <div class="numpad-wrap">
           <button class="numpad-trigger" onclick="openNumpad(event,'aff3')">Affix Points</button>
@@ -560,11 +561,11 @@
           <button class="picker-trigger" id="btn-a4" onclick="togglePicker(event,'a4')">
             <img id="a4_prev" class="picker-icon">
             <span class="picker-label none" id="a4-label">(None)</span>
-            <span class="picker-cat" id="a4-cat"></span>
             <span class="picker-arrow">▾</span>
           </button>
           <div class="picker-drop" id="picker-a4-drop"></div>
         </div>
+        <span class="picker-cat" id="a4-cat"></span>
         <input type="hidden" id="a4" value="">
         <span class="overflow-tag">Overflow — 3/3/3/1+ builds</span>
       </div>
@@ -589,10 +590,11 @@
         <div class="picker-drop" id="picker-g1Affix-drop"></div>
       </div>
       <input type="hidden" id="g1Affix" value="Any">
-      <select id="g1Value">
-        <option value="3">3</option><option value="6">6</option>
-        <option value="9">9</option><option value="12">12</option>
-      </select>
+      <div class="numpad-wrap" style="flex-direction:column;align-items:center">
+        <button class="numpad-trigger" onclick="openGrimNumpad(event,'g1Value')">Nodes</button>
+        <span class="numpad-display" id="g1Value-disp" style="display:block;text-align:center;margin-top:4px">3</span>
+      </div>
+      <input type="hidden" id="g1Value" value="3">
     </div>
     <div class="grimoire-pair">
       <span class="grimoire-pair-label">Slot 2</span>
@@ -606,10 +608,11 @@
         <div class="picker-drop" id="picker-g2Affix-drop"></div>
       </div>
       <input type="hidden" id="g2Affix" value="Any">
-      <select id="g2Value">
-        <option value="3">3</option><option value="6">6</option>
-        <option value="9">9</option><option value="12">12</option>
-      </select>
+      <div class="numpad-wrap" style="flex-direction:column;align-items:center">
+        <button class="numpad-trigger" onclick="openGrimNumpad(event,'g2Value')">Nodes</button>
+        <span class="numpad-display" id="g2Value-disp" style="display:block;text-align:center;margin-top:4px">3</span>
+      </div>
+      <input type="hidden" id="g2Value" value="3">
     </div>
     </div>
   </div>
@@ -620,6 +623,14 @@
 
   <div id="output"></div>
 
+</div>
+
+<!-- Grimoire numpad popup -->
+<div id="grim-numpad" class="numpad-popup" style="width:130px">
+  <button class="numpad-key" data-val="3">3</button>
+  <button class="numpad-key" data-val="6">6</button>
+  <button class="numpad-key" data-val="9">9</button>
+  <button class="numpad-key" data-val="12" style="grid-column:2">12</button>
 </div>
 
 <!-- Shared numpad popup -->
@@ -963,6 +974,42 @@ function closeNumpad() {
   _numpadTarget = null;
 }
 
+// ── Grimoire Numpad ──
+let _grimTarget = null;
+const _grimEl = document.getElementById("grim-numpad");
+
+function openGrimNumpad(e, targetId) {
+  e.stopPropagation();
+  closeNumpad();
+  _grimTarget = targetId;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const popupH = 110;
+  const top = (rect.bottom + popupH + 8 < window.innerHeight)
+    ? rect.bottom + 8
+    : rect.top - popupH - 8;
+  _grimEl.style.top  = top + "px";
+  _grimEl.style.left = (rect.left + rect.width / 2) + "px";
+  _grimEl.style.transform = "translateX(-50%)";
+  _grimEl.classList.add("open");
+}
+
+function closeGrimNumpad() {
+  _grimEl.classList.remove("open");
+  _grimTarget = null;
+}
+
+function setGrimVal(id, val) {
+  document.getElementById(id).value = val;
+  document.getElementById(id + "-disp").textContent = val;
+}
+
+_grimEl.addEventListener("click", e => {
+  const key = e.target.closest(".numpad-key");
+  if (!key || !_grimTarget) return;
+  setGrimVal(_grimTarget, key.dataset.val);
+  closeGrimNumpad();
+});
+
 _numpadEl.addEventListener("click", e => {
   const key = e.target.closest(".numpad-key");
   if (!key || !_numpadTarget) return;
@@ -973,7 +1020,7 @@ _numpadEl.addEventListener("click", e => {
 });
 
 document.addEventListener("click", e => {
-  if (!e.target.closest("#numpad-popup") && !e.target.closest(".numpad-trigger")) closeNumpad();
+  if (!e.target.closest("#numpad-popup") && !e.target.closest("#grim-numpad") && !e.target.closest(".numpad-trigger")) { closeNumpad(); closeGrimNumpad(); }
   if (!e.target.closest(".affix-picker")) { closeAllPickers(); closeAllGrimPickers(); }
 });
 
@@ -1141,8 +1188,8 @@ function randomize(){
   selectGrimAffix("g1Affix",g1);
   selectGrimAffix("g2Affix",g2);
   const grimVals=[3,6,9,12];
-  document.getElementById("g1Value").value=grimVals[Math.floor(Math.random()*4)];
-  document.getElementById("g2Value").value=grimVals[Math.floor(Math.random()*4)];
+  setGrimVal("g1Value",grimVals[Math.floor(Math.random()*4)]);
+  setGrimVal("g2Value",grimVals[Math.floor(Math.random()*4)]);
 }
 
 function reset(){
@@ -1153,8 +1200,8 @@ function reset(){
     document.getElementById(id+"-disp").textContent=0;
   });
   selectGrimAffix("g1Affix","Any"); selectGrimAffix("g2Affix","Any");
-  document.getElementById("g1Value").value=3;
-  document.getElementById("g2Value").value=3;
+  setGrimVal("g1Value",3);
+  setGrimVal("g2Value",3);
   document.getElementById("snapNote").textContent="";
   document.getElementById("output").innerHTML="";
 }
