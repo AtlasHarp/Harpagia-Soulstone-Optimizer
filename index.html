@@ -760,6 +760,19 @@ function buildGrimPickerDrop(slotId) {
   drop.innerHTML = html;
 }
 
+let _openPickerBtn = null, _openPickerDrop = null;
+let _openGrimPickerBtn = null, _openGrimPickerDrop = null;
+
+function positionDrop(btn, drop) {
+  const rect = btn.getBoundingClientRect();
+  const dropH = 290;
+  const top = (rect.bottom + dropH + 4 < window.innerHeight)
+    ? rect.bottom + 4
+    : rect.top - dropH - 4;
+  drop.style.left = rect.left + "px";
+  drop.style.top  = top + "px";
+}
+
 function toggleGrimPicker(e, slotId) {
   e.stopPropagation();
   const drop = document.getElementById("picker-" + slotId + "-drop");
@@ -770,16 +783,12 @@ function toggleGrimPicker(e, slotId) {
   if (!isOpen) {
     document.body.appendChild(drop);
     buildGrimPickerDrop(slotId);
-    const rect = btn.getBoundingClientRect();
-    const dropH = 290;
-    const top = (rect.bottom + dropH + 4 < window.innerHeight)
-      ? rect.bottom + 4
-      : rect.top - dropH - 4;
-    drop.style.left = rect.left + "px";
-    drop.style.top  = top + "px";
-    drop.style.minWidth = Math.max(rect.width, 220) + "px";
+    drop.style.minWidth = Math.max(btn.getBoundingClientRect().width, 220) + "px";
+    positionDrop(btn, drop);
     drop.classList.add("open");
     btn.classList.add("open");
+    _openGrimPickerBtn = btn;
+    _openGrimPickerDrop = drop;
   }
 }
 
@@ -787,6 +796,7 @@ function closeGrimPicker(slotId) {
   document.getElementById("picker-" + slotId + "-drop").classList.remove("open");
   document.getElementById("btn-" + slotId).classList.remove("open");
   hideConflictTip();
+  _openGrimPickerBtn = null; _openGrimPickerDrop = null;
 }
 
 function closeAllGrimPickers() {
@@ -891,23 +901,16 @@ function togglePicker(e, slotId) {
   const drop = document.getElementById("picker-" + slotId + "-drop");
   const btn  = document.getElementById("btn-" + slotId);
   const isOpen = drop.classList.contains("open");
-  // Close all first
   closeAllPickers();
   if (!isOpen) {
-    // Move drop to body so CSS transforms on ancestor cards don't affect fixed positioning
     document.body.appendChild(drop);
     buildPickerDrop(slotId);
-    const rect = btn.getBoundingClientRect();
-    // Flip above button if not enough room below
-    const dropH = 290;
-    const top = (rect.bottom + dropH + 4 < window.innerHeight)
-      ? rect.bottom + 4
-      : rect.top - dropH - 4;
-    drop.style.left = rect.left + "px";
-    drop.style.top  = top + "px";
-    drop.style.minWidth = Math.max(rect.width, 220) + "px";
+    drop.style.minWidth = Math.max(btn.getBoundingClientRect().width, 220) + "px";
+    positionDrop(btn, drop);
     drop.classList.add("open");
     btn.classList.add("open");
+    _openPickerBtn = btn;
+    _openPickerDrop = drop;
   }
 }
 
@@ -915,6 +918,7 @@ function closePicker(slotId) {
   document.getElementById("picker-" + slotId + "-drop").classList.remove("open");
   document.getElementById("btn-" + slotId).classList.remove("open");
   hideConflictTip();
+  _openPickerBtn = null; _openPickerDrop = null;
 }
 
 function closeAllPickers() {
@@ -953,49 +957,65 @@ function showDupeTip(e, slotName) {
 
 // ── Numpad ──
 let _numpadTarget = null;
+let _numpadTrigger = null;
 const _numpadEl = document.getElementById("numpad-popup");
 
-function openNumpad(e, targetId) {
-  e.stopPropagation();
-  _numpadTarget = targetId;
-  const rect = e.currentTarget.getBoundingClientRect();
+function positionNumpad() {
+  if (!_numpadTrigger) return;
+  const rect = _numpadTrigger.getBoundingClientRect();
   const popupH = 190;
   const top = (rect.bottom + popupH + 8 < window.innerHeight)
     ? rect.bottom + 8
     : rect.top - popupH - 8;
   _numpadEl.style.top  = top + "px";
   _numpadEl.style.left = (rect.left + rect.width / 2) + "px";
+}
+
+function openNumpad(e, targetId) {
+  e.stopPropagation();
+  _numpadTarget = targetId;
+  _numpadTrigger = e.currentTarget;
   _numpadEl.style.transform = "translateX(-50%)";
   _numpadEl.classList.add("open");
+  positionNumpad();
 }
 
 function closeNumpad() {
   _numpadEl.classList.remove("open");
   _numpadTarget = null;
+  _numpadTrigger = null;
 }
 
 // ── Grimoire Numpad ──
 let _grimTarget = null;
+let _grimTrigger = null;
 const _grimEl = document.getElementById("grim-numpad");
 
-function openGrimNumpad(e, targetId) {
-  e.stopPropagation();
-  closeNumpad();
-  _grimTarget = targetId;
-  const rect = e.currentTarget.getBoundingClientRect();
+function positionGrimNumpad() {
+  if (!_grimTrigger) return;
+  const rect = _grimTrigger.getBoundingClientRect();
   const popupH = 110;
   const top = (rect.bottom + popupH + 8 < window.innerHeight)
     ? rect.bottom + 8
     : rect.top - popupH - 8;
   _grimEl.style.top  = top + "px";
   _grimEl.style.left = (rect.left + rect.width / 2) + "px";
+}
+
+function openGrimNumpad(e, targetId) {
+  e.stopPropagation();
+  closeNumpad();
+  _grimTarget = targetId;
+  _grimTrigger = e.currentTarget;
   _grimEl.style.transform = "translateX(-50%)";
   _grimEl.classList.add("open");
+  positionGrimNumpad();
 }
 
 function closeGrimNumpad() {
   _grimEl.classList.remove("open");
   _grimTarget = null;
+  _grimTrigger = null;
 }
 
 function setGrimVal(id, val) {
@@ -1023,6 +1043,14 @@ document.addEventListener("click", e => {
   if (!e.target.closest("#numpad-popup") && !e.target.closest("#grim-numpad") && !e.target.closest(".numpad-trigger")) { closeNumpad(); closeGrimNumpad(); }
   if (!e.target.closest(".affix-picker")) { closeAllPickers(); closeAllGrimPickers(); }
 });
+
+function repositionAll() {
+  positionNumpad(); positionGrimNumpad();
+  if (_openPickerBtn && _openPickerDrop) positionDrop(_openPickerBtn, _openPickerDrop);
+  if (_openGrimPickerBtn && _openGrimPickerDrop) positionDrop(_openGrimPickerBtn, _openGrimPickerDrop);
+}
+window.addEventListener("scroll", repositionAll, { passive: true });
+window.addEventListener("resize", repositionAll, { passive: true });
 
 function combinations(arr,k){
   const result=[];
