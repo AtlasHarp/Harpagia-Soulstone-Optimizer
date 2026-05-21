@@ -468,6 +468,25 @@
     .stone-img { width: 150px; height: 150px; }
     .affix-slot { width: 100%; }
   }
+
+  @media (max-width: 480px) {
+    body { padding: 16px 12px 40px; }
+
+    .stone-wheel {
+      grid-template-areas: "s" "tl" "tr" "bl" "br";
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      row-gap: 10px;
+    }
+    .stone-img { width: 80px; height: 80px; }
+
+    .grimoire-pairs { flex-direction: column; gap: 10px; }
+
+    .totals-name { min-width: 110px; font-size: 14px; }
+    .totals-val  { font-size: 13px; }
+    .build-row   { font-size: 14px; }
+    .glyph-row   { font-size: 14px; }
+  }
 </style>
 </head>
 <body>
