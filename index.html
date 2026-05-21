@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=760">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Harpagia Soulstone Optimizer</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 <style>
@@ -331,6 +331,7 @@
   .affix-slot select { width: 100%; }
   .affix-slot .sel-wrap { width: 100%; justify-content: center; }
   .affix-slot .picker-cat { text-align: center; }
+  .grimoire-pair .picker-cat { text-align: center; }
   .affix-slot .sel-preview { width: 28px; height: 28px; }
   .affix-slot input[type=number] { width: 80px; text-align: center; }
   .overflow-tag {
@@ -599,14 +600,16 @@
     <div class="grimoire-pairs">
     <div class="grimoire-pair">
       <span class="grimoire-pair-label">Slot 1</span>
-      <div class="affix-picker" id="picker-g1Affix">
-        <button class="picker-trigger" id="btn-g1Affix" onclick="toggleGrimPicker(event,'g1Affix')">
-          <img id="g1Affix_prev" class="picker-icon">
-          <span class="picker-label" id="g1Affix-label">Any</span>
-          <span class="picker-cat" id="g1Affix-cat"></span>
-          <span class="picker-arrow">▾</span>
-        </button>
-        <div class="picker-drop" id="picker-g1Affix-drop"></div>
+      <div style="display:flex;flex-direction:column;flex:1;min-width:0;gap:4px;">
+        <div class="affix-picker" id="picker-g1Affix">
+          <button class="picker-trigger" id="btn-g1Affix" onclick="toggleGrimPicker(event,'g1Affix')">
+            <img id="g1Affix_prev" class="picker-icon">
+            <span class="picker-label" id="g1Affix-label">Any</span>
+            <span class="picker-arrow">▾</span>
+          </button>
+          <div class="picker-drop" id="picker-g1Affix-drop"></div>
+        </div>
+        <span class="picker-cat" id="g1Affix-cat"></span>
       </div>
       <input type="hidden" id="g1Affix" value="Any">
       <div class="numpad-wrap" style="flex-direction:column;align-items:center">
@@ -617,14 +620,16 @@
     </div>
     <div class="grimoire-pair">
       <span class="grimoire-pair-label">Slot 2</span>
-      <div class="affix-picker" id="picker-g2Affix">
-        <button class="picker-trigger" id="btn-g2Affix" onclick="toggleGrimPicker(event,'g2Affix')">
-          <img id="g2Affix_prev" class="picker-icon">
-          <span class="picker-label" id="g2Affix-label">Any</span>
-          <span class="picker-cat" id="g2Affix-cat"></span>
-          <span class="picker-arrow">▾</span>
-        </button>
-        <div class="picker-drop" id="picker-g2Affix-drop"></div>
+      <div style="display:flex;flex-direction:column;flex:1;min-width:0;gap:4px;">
+        <div class="affix-picker" id="picker-g2Affix">
+          <button class="picker-trigger" id="btn-g2Affix" onclick="toggleGrimPicker(event,'g2Affix')">
+            <img id="g2Affix_prev" class="picker-icon">
+            <span class="picker-label" id="g2Affix-label">Any</span>
+            <span class="picker-arrow">▾</span>
+          </button>
+          <div class="picker-drop" id="picker-g2Affix-drop"></div>
+        </div>
+        <span class="picker-cat" id="g2Affix-cat"></span>
       </div>
       <input type="hidden" id="g2Affix" value="Any">
       <div class="numpad-wrap" style="flex-direction:column;align-items:center">
